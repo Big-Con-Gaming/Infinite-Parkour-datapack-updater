@@ -1,6 +1,6 @@
 @echo off
-cd C:\Users\%username%\Documents\GitHub\Infinite-Parkour-datapack-updater
-python -m nuitka --follow-imports --enable-plugin=tk-inter --standalone --onefile --remove-output --windows-console-mode=attach --mingw64 --windows-icon-from-ico=pack.ico packupdater.py
+cd C:\Users\%username%\Documents\GitHub\PyPackager
 
+python main.py "C:\Users\%username%\Documents\GitHub\Infinite-Parkour-datapack-updater\packupdater.py" -tk -nc -i="C:\Users\%username%\Documents\GitHub\Infinite-Parkour-datapack-updater\pack.ico"
 
-python -m nuitka --follow-imports --enable-plugin=tk-inter --standalone --onefile --remove-output --windows-console-mode=disable --mingw64 --windows-icon-from-ico=pack.ico updaterinstaller.py
+python main.py "C:\Users\%username%\Documents\GitHub\Infinite-Parkour-datapack-updater\updaterinstaller.py" -tk -nc -i="C:\Users\%username%\Documents\GitHub\Infinite-Parkour-datapack-updater\pack.ico"
