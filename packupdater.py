@@ -8,7 +8,7 @@ from zipfile import ZipFile
 from sys import exit
 from fnmatch import fnmatch
 from json import dump, load
-from urllib.request import urlretrieve
+from urllib.request import urlopen, urlretrieve
 from tarfile import open as opentar
 from traceback import format_exc
 
@@ -91,7 +91,6 @@ def updatepack():
         world_path = find_world(saves_path)
         if not world_path:
             return
-
         if custom_path:
             save_config(custom_path)
 
@@ -100,16 +99,18 @@ def updatepack():
         rmtree(dirname(datapack_path))
         makedirs(dirname(datapack_path))
 
-        urlretrieve(
-            'https://github.com/Big-Con-Gaming/Infinite-Parkour-datapack/archive/refs/heads/main.zip',
-            f'{dirname(datapack_path)}/temp.zip'
-        )
+        # --- changed section ---
+        api_url = "https://api.github.com/repos/Big-Con-Gaming/Infinite-Parkour-datapack/releases/latest"
+        with urlopen(api_url) as resp:
+            release = load(resp)
+        zip_url = release["zipball_url"]
+        urlretrieve(zip_url, f'{dirname(datapack_path)}/temp.zip')
+        # --- end changed section ---
 
         log_message(f"Downloaded zip file to {dirname(datapack_path)}/temp.zip")
 
-        zip = ZipFile(f'{dirname(datapack_path)}/temp.zip', mode="r")
-        zip.extractall(dirname(datapack_path))
-        zip.close()
+        with ZipFile(f'{dirname(datapack_path)}/temp.zip', mode="r") as zipf:
+            zipf.extractall(dirname(datapack_path))
 
         remove(f'{dirname(datapack_path)}/temp.zip')
         log_message(f"Extracted datapack to {datapack_path}")
