@@ -17,8 +17,8 @@ EXCLUDED_FILES = {
 
 
 def cache_jumpacks():
-    print("Caching jumpacks...")
-    world_path = get_custom_path()
+    log_message("Caching jumpacks...")
+    world_path, _ = get_custom_path()
     if not world_path:
         return
 
@@ -57,14 +57,14 @@ def importpack():
             messagebox.showerror("Error", "Please select a valid .jumpack file.")
             return
 
-        world_path = get_custom_path()
+        world_path, _ = get_custom_path()
         if not world_path or not os.path.isdir(world_path):
             messagebox.showerror("Error", "Cannot find world. Please ensure the path is correct and the world exists.")
             return
 
         data_path = os.path.join(world_path, "data")
         os.makedirs(data_path, exist_ok=True)
-        print(f"Importing pack to: {data_path}")
+        log_message(f"Importing pack to: {data_path}")
 
         with tarfile.open(pack, "r:gz") as tar:
             members = tar.getmembers()
@@ -79,7 +79,6 @@ def importpack():
 
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(error_trace)
         messagebox.showerror("Error", f"An error occurred.\n{e}")
         copy_to_clipboard(error_trace, True)
         log_message("Error occurred while importing pack:\n" + error_trace)
@@ -102,7 +101,6 @@ def exportpack():
 
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(error_trace)
         messagebox.showerror("Error", f"An error occurred.\n{e}")
         copy_to_clipboard(error_trace, True)
         log_message("Error occurred while exporting pack:\n" + error_trace)

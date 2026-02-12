@@ -51,33 +51,72 @@ def download_and_extract_release(datapack_path):
         if os.path.exists(zip_path):
             os.remove(zip_path)
 
+def download_and_extract_latest_commit(datapack_path):
+    zip_url = "https://github.com/Big-Con-Gaming/Infinite-Parkour-datapack/archive/refs/heads/main.zip"
+    zip_path = os.path.join(datapack_path, "temp.zip")
 
-def updatepack():
+    os.makedirs(datapack_path, exist_ok=True)
+
+    try:
+
+        urllib.request.urlretrieve(zip_url, zip_path)
+        log_message(f"Downloaded zip file to {zip_path}")
+
+        with zipfile.ZipFile(zip_path, "r") as zipf:
+            zipf.extractall(datapack_path)
+
+        log_message(f"Extracted datapack to {datapack_path}")
+
+        extracted_items = os.listdir(datapack_path)
+        if len(extracted_items) == 2 and "temp.zip" in extracted_items:
+            extracted_items.remove("temp.zip")
+
+        if len(extracted_items) == 1:
+            top_dir = os.path.join(datapack_path, extracted_items[0])
+            if os.path.isdir(top_dir):
+                for item in os.listdir(top_dir):
+                    shutil.move(os.path.join(top_dir, item), datapack_path)
+                shutil.rmtree(top_dir)
+
+    except Exception as e:
+        log_message(f"Error downloading or extracting release: {e}")
+        raise
+
+    finally:
+        if os.path.exists(zip_path):
+            os.remove(zip_path)
+
+def updatepack(dev_build=False):
     log_message("Starting updater...")
     try:
         custom_path = txt.get().strip()
 
-        world_path = get_custom_path()
+        world_path, server = get_custom_path()
         if not world_path:
             return
 
         if custom_path:
             save_config(custom_path)
 
-        datapacks_dir = os.path.join(world_path, "datapacks")
+        datapacks_dir = os.path.join(world_path, "datapacks") if not server else os.path.join(world_path, "world", "datapacks")
         datapack_path = os.path.join(datapacks_dir, "infinite_parkour")
 
         if os.path.exists(datapacks_dir):
             shutil.rmtree(datapacks_dir)
         os.makedirs(datapacks_dir, exist_ok=True)
-
-        download_and_extract_release(datapack_path)
+        if dev_build:
+            download_and_extract_latest_commit(datapack_path)
+        else:
+            download_and_extract_release(datapack_path)
 
         os.chdir(datapack_path)
         subprocess.run([os.path.join(datapack_path, "build.bat")], shell=True, check=True)
-
-        messagebox.showinfo("Done", "Update complete!")
-        log_message("Update complete!")
+        if dev_build:
+            messagebox.showinfo("Done", "Latest commit downloaded!")
+            log_message("Latest commit downloaded!")
+        else:
+            messagebox.showinfo("Done", "Update complete!")
+            log_message("Update complete!")
 
     except Exception as e:
         error_trace = traceback.format_exc()
@@ -85,6 +124,8 @@ def updatepack():
         copy_to_clipboard(error_trace, True)
         log_message("Error occurred:\n" + error_trace)
         messagebox.showerror("Error", f"{e}\nAn error occurred.\nError copied to clipboard.")
+    finally:
+        os.chdir('c:\\')
 
 
 def reset_config():
@@ -95,10 +136,6 @@ def reset_config():
     log_message("Config reset.")
 
 
-def update():
-    subprocess.Popen([os.path.join(os.path.dirname(os.path.abspath(__file__)), "updaterinstaller.exe"), "restart"], shell=True)
-    sys.exit()
-
 
 def main():
     global root, txt, log_window, log_text
@@ -107,7 +144,7 @@ def main():
     root.title("Infinite Parkour - Pack Manager")
     root.geometry("400x260")
     root.resizable(False, False)
-    log_window, log_text = gui_initialize(root, update, reset_config, updatepack)
+    log_window, log_text = gui_initialize(root, reset_config, updatepack)
 
     main_frame = ttk.Frame(root, padding=10)
     main_frame.grid(row=0, column=0, sticky="nsew")

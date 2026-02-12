@@ -16,6 +16,7 @@ def copy_to_clipboard(text, silent=False):
 
 
 def log_message(message):
+    print(message)
     if log_window:
         log_text.config(state="normal")
         log_text.insert(END, message + "\n")
@@ -28,7 +29,7 @@ def find_world(start_dir):
         for dir_name in dirs:
             if fnmatch.fnmatch(dir_name, "*infinite-parkour*"):
                 path = os.path.join(root, dir_name)
-                print(f"Found world: {path}")
+                log_message(f"Found world: {path}")
                 return path
 
     log_message("Cannot find world")
@@ -43,7 +44,6 @@ def save_config(custom_path):
         json.dump({"data": custom_path}, f, indent=4)
     log_message("Config saved")
 
-
 def load_config():
     config_path = os.path.join(os.path.expandvars("%LOCALAPPDATA%"), "Infinite-Parkour", "updaterconfig.json")
     if os.path.exists(config_path):
@@ -56,14 +56,16 @@ def load_config():
 def get_custom_path():
     custom_path = txt.get().strip()
     if custom_path:
+        if os.path.isfile(os.path.join(custom_path, "server.properties")):
+            return custom_path, True
         saves_path = os.path.join(custom_path, "saves")
     else:
         saves_path = os.path.join(os.path.expandvars("%APPDATA%"), ".minecraft", "saves")
         if not os.path.exists(saves_path):
             log_message("Default saves path not found. Please select your Minecraft folder.")
             messagebox.showerror("Error", "Default saves path not found. Please select your Minecraft folder.")
-            return None
-    return find_world(saves_path)
+            return None, False
+    return find_world(saves_path), False
 
 
 def select_file(folder=""):
