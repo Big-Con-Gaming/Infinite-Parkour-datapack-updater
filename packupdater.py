@@ -1,15 +1,9 @@
-import os
-import sys
-import json
-import shutil
-import zipfile
-import traceback
-import subprocess
-import urllib.request
+import os, json, shutil, zipfile, traceback, subprocess, urllib.request, sys
 from tkinter import Tk, END, messagebox
 import tkinter.ttk as ttk
 from components.util import copy_to_clipboard, log_message, get_custom_path, save_config, load_config, initialize as util_initialize
 from components.gui import setup_buttons, initialize as gui_initialize
+from components.jumppacks import load_pack
 
 
 def download_and_extract_release(datapack_path):
@@ -91,14 +85,14 @@ def updatepack(dev_build=False):
     try:
         custom_path = txt.get().strip()
 
-        world_path, server = get_custom_path()
+        world_path = get_custom_path()
         if not world_path:
             return
 
         if custom_path:
             save_config(custom_path)
 
-        datapacks_dir = os.path.join(world_path, "datapacks") if not server else os.path.join(world_path, "world", "datapacks")
+        datapacks_dir = os.path.join(world_path, "datapacks")
         datapack_path = os.path.join(datapacks_dir, "infinite_parkour")
 
         if os.path.exists(datapacks_dir):
@@ -120,7 +114,6 @@ def updatepack(dev_build=False):
 
     except Exception as e:
         error_trace = traceback.format_exc()
-        print(error_trace)
         copy_to_clipboard(error_trace, True)
         log_message("Error occurred:\n" + error_trace)
         messagebox.showerror("Error", f"{e}\nAn error occurred.\nError copied to clipboard.")
@@ -135,11 +128,16 @@ def reset_config():
     txt.delete(0, END)
     log_message("Config reset.")
 
-
+def check_for_java():
+    try:
+        subprocess.run(["java", "-version"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        return True
+    except Exception:
+        messagebox.showerror("Error", "Java is not installed or not added to PATH. The updater can somtimes not work without it. Please install Java and add it to your PATH environment variable.")
+        return False
 
 def main():
     global root, txt, log_window, log_text
-
     root = Tk()
     root.title("Infinite Parkour - Pack Manager")
     root.geometry("400x260")
@@ -157,6 +155,15 @@ def main():
     txt.insert(0, load_config())
 
     setup_buttons(main_frame)
+
+    check_for_java()
+
+    if len(sys.argv) == 2:
+        jumppack = sys.argv[1]
+        if os.path.exists(jumppack) and os.path.isfile(jumppack):
+            log_message(f"Importing jumppack: {jumppack}")
+            load_pack(jumppack)
+            
 
     root.mainloop()
 

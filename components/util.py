@@ -57,15 +57,15 @@ def get_custom_path():
     custom_path = txt.get().strip()
     if custom_path:
         if os.path.isfile(os.path.join(custom_path, "server.properties")):
-            return custom_path, True
+            return os.path.join(custom_path, "world")
         saves_path = os.path.join(custom_path, "saves")
     else:
         saves_path = os.path.join(os.path.expandvars("%APPDATA%"), ".minecraft", "saves")
         if not os.path.exists(saves_path):
             log_message("Default saves path not found. Please select your Minecraft folder.")
             messagebox.showerror("Error", "Default saves path not found. Please select your Minecraft folder.")
-            return None, False
-    return find_world(saves_path), False
+            return None
+    return find_world(saves_path)
 
 
 def select_file(folder=""):

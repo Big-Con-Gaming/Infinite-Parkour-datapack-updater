@@ -2,7 +2,7 @@ from tkinter import Toplevel, ttk, Text, Scrollbar
 from threading import Thread
 from components.util import copy_to_clipboard
 from components.util import select_directory
-from components.jumpacks import importpack, exportpack
+from components.jumppacks import importpack, exportpack
 
 def initialize(root, reset_cb, updatepack_cb):
     global log_window, log_text, _reset_config, _updatepack, _root
@@ -62,7 +62,7 @@ def setup_buttons(main_frame):
     btn_run.grid(row=0, column=0, padx=5, pady=5, sticky="ew")
     buttons.append(btn_run)
 
-    btn_dev = ttk.Button(action_frame, text="Download latest", command=lambda: start_thread(_updatepack, True))
+    btn_dev = ttk.Button(action_frame, text="Download dev", command=lambda: start_thread(_updatepack, True))
     btn_dev.grid(row=2, column=0, padx=5, pady=5, sticky="ew")
     buttons.append(btn_dev)
 
@@ -70,11 +70,11 @@ def setup_buttons(main_frame):
     btn_reset.grid(row=0, column=1, padx=5, pady=5, sticky="ew")
     buttons.append(btn_reset)
 
-    btn_import = ttk.Button(action_frame, text="Import jumpack", command=lambda: start_thread(importpack))
+    btn_import = ttk.Button(action_frame, text="Import jumppack", command=lambda: start_thread(importpack))
     btn_import.grid(row=1, column=0, padx=5, pady=5, sticky="ew")
     buttons.append(btn_import)
 
-    btn_export = ttk.Button(action_frame, text="Export jumpack", command=lambda: start_thread(exportpack))
+    btn_export = ttk.Button(action_frame, text="Export jumppack", command=lambda: start_thread(exportpack))
     btn_export.grid(row=1, column=1, padx=5, pady=5, sticky="ew")
     buttons.append(btn_export)
 
