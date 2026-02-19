@@ -69,7 +69,8 @@ def get_custom_path():
 
 
 def select_file(folder=""):
-    file_path = filedialog.askopenfilename(initialdir=folder)
+    filetypes = [("Jump packs", "*.jumppack"), ("All files", "*.*")]
+    file_path = filedialog.askopenfilename(initialdir=folder, filetypes=filetypes, title="Select file")
     return file_path or None
 
 
