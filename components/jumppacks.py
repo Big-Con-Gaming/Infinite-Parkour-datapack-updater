@@ -44,8 +44,9 @@ def cache_jumppacks():
             with tarfile.open(output_path, "w:gz") as tar:
                 tar.add(source, arcname=filename)
             log_message(f"Cached jumppack: {output_path}")
-        except Exception as e:
-            log_message(f"Failed to cache {filename}: {e}")
+        except Exception:
+            error_trace = traceback.format_exc()
+            log_message(f"Failed to cache {filename}: {error_trace}")
 
 def load_pack(pack):
     if not pack:
