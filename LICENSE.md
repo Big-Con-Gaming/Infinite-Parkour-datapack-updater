@@ -1,4 +1,4 @@
-Copyright (c) 2025, MrBooks36
+Copyright (c) 2026, MrBooks36
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
